@@ -222,4 +222,4 @@ Through this project, I gained practical experience in:
 
 ---
 
-If you find this project useful, feel free to ⭐ the repository.
+
