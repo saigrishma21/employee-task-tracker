@@ -1,92 +1,225 @@
 # Employee Task Tracker
 
-A full-stack employee and task management application built with React, FastAPI, SQLAlchemy and PostgreSQL. It implements the requirements in the supplied practical assignment.
+A full-stack web application built to manage employees, assign tasks, track task progress, and monitor overall productivity through a centralized dashboard.
+
+The application provides employee management, task assignment, status tracking, and dashboard statistics using a React frontend, FastAPI backend, and PostgreSQL database.
 
 ## Features
-- Dashboard: employee count, task count, completed count, pending count and completion progress.
-- Employees: create, list, search and delete employees. Email addresses are unique.
-- Tasks: create tasks with title, description, priority and due date; assign each task to an employee; list tasks with employee names; filter by status; update status.
-- Persistent PostgreSQL storage, API validation, useful HTTP errors and Swagger documentation.
 
-## Requirements
-- Python 3.10+
-- Node.js 18+
-- Docker Desktop (recommended for PostgreSQL), or an existing PostgreSQL 14+ database.
+### Employee Management
+- Add employees with name, email, and department.
+- View the list of registered employees.
+- Delete employee records.
+- Search employees by name.
 
-## Run locally
+### Task Management
+- Create tasks with title, description, priority, and due date.
+- Assign tasks to employees.
+- View tasks along with their assigned employee details.
+- Update task status:
+  - Pending
+  - In Progress
+  - Completed
+- Filter and track tasks based on their status.
 
-### 1. Start PostgreSQL
-From the project root:
+### Dashboard
+- View the total number of employees.
+- Monitor the total number of tasks.
+- Track completed tasks.
+- Monitor pending tasks.
 
-```bash
-docker compose up -d db
+## Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React.js, JavaScript, HTML, CSS |
+| Backend | Python, FastAPI |
+| Database | PostgreSQL |
+| API Documentation | Swagger UI |
+| API Communication | REST APIs |
+| Development Tools | VS Code, Git, GitHub, Docker |
+
+## Project Architecture
+
+```text
+employee-task-tracker/
+│
+├── backend/
+│   ├── app/
+│   │   ├── database.py
+│   │   ├── models.py
+│   │   ├── schemas.py
+│   │   └── main.py
+│   │
+│   ├── requirements.txt
+│   └── .env.example
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── styles.css
+│   │
+│   └── package.json
+│
+├── docker-compose.yml
+├── .gitignore
+└── README.md
 ```
 
-This creates database `task_tracker` on `localhost:5432` with user/password `postgres`/`postgres` for local development.
+## Application Workflow
 
-### 2. Start the FastAPI backend
-Open a terminal:
+1. The user opens the React application.
+2. The frontend sends HTTP requests to the FastAPI backend.
+3. FastAPI processes the requests and communicates with PostgreSQL.
+4. Employee and task information is stored and retrieved from the database.
+5. The frontend displays updated employee records, task details, and dashboard statistics.
+
+## Installation and Setup
+
+### Prerequisites
+
+Make sure the following tools are installed:
+
+- Python 3.12+
+- Node.js and npm
+- Docker Desktop
+- Git
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/employee-task-tracker.git
+cd employee-task-tracker
+```
+
+### 2. Start PostgreSQL Using Docker
+
+```bash
+docker compose up -d
+```
+
+### 3. Configure the Backend
+
+Navigate to the backend directory:
 
 ```bash
 cd backend
+```
+
+Create and activate a virtual environment:
+
+```powershell
 python -m venv venv
-# Windows PowerShell: .\venv\Scripts\Activate.ps1
-# macOS/Linux: source venv/bin/activate
+.\venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
-copy .env.example .env  # Windows; on macOS/Linux use: cp .env.example .env
+```
+
+Create a `.env` file inside the `backend` directory and configure your database connection:
+
+```env
+DATABASE_URL=postgresql+psycopg://postgres:postgres@127.0.0.1:5433/task_tracker
+```
+
+Start the FastAPI server:
+
+```bash
 uvicorn app.main:app --reload
 ```
 
-API: http://localhost:8000  
-Swagger UI: http://localhost:8000/docs
+Backend URL:
 
-If your PostgreSQL credentials differ, edit `DATABASE_URL` in `backend/.env`.
+```text
+http://127.0.0.1:8000
+```
 
-### 3. Start the React frontend
-In a second terminal:
+### 4. Access Swagger API Documentation
+
+Open the following URL in your browser:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Swagger UI allows you to explore and test the backend API endpoints.
+
+### 5. Configure the Frontend
+
+Open another terminal and navigate to the frontend directory:
 
 ```bash
 cd frontend
+```
+
+Install dependencies:
+
+```bash
 npm install
+```
+
+Start the React development server:
+
+```bash
 npm run dev
 ```
 
-Open the URL printed by Vite (normally http://localhost:5173).
+Frontend URL:
 
-If the API is hosted somewhere else, create `frontend/.env` with:
-
-```env
-VITE_API_URL=http://localhost:8000/api
+```text
+http://localhost:5173
 ```
 
-## API endpoints
+## API Functionality
 
-| Method | Endpoint | Purpose |
+The backend provides REST API endpoints for managing employees, tasks, and dashboard information.
+
+| Method | Endpoint | Functionality |
 |---|---|---|
-| GET | `/api/dashboard` | Dashboard counts |
-| GET | `/api/employees` | List employees; optional `?search=name` |
-| POST | `/api/employees` | Create employee |
-| DELETE | `/api/employees/{id}` | Delete employee and their assigned tasks |
-| GET | `/api/tasks` | List tasks; optional `?status=Pending` or `?employee_id=1` |
-| POST | `/api/tasks` | Create and assign a task |
+| GET | `/api/employees` | Retrieve employees |
+| POST | `/api/employees` | Add a new employee |
+| DELETE | `/api/employees/{id}` | Delete an employee |
+| GET | `/api/tasks` | Retrieve tasks |
+| POST | `/api/tasks` | Create a task |
 | PATCH | `/api/tasks/{id}/status` | Update task status |
+| GET | `/api/dashboard` | Retrieve dashboard statistics |
 
-## Database design
-- `employees`: `id` primary key, `name`, unique `email`, `department`, `created_at`.
-- `tasks`: `id` primary key, `title`, `description`, `priority`, `due_date`, `status`, `employee_id` foreign key, `created_at`.
-- Relationship: one employee can own many tasks. Deleting an employee deletes their tasks (also reflected in the ORM relationship).
+*Refer to Swagger UI for the exact request parameters and response formats.*
 
-Tables are created automatically on backend startup. For a production deployment, use Alembic migrations rather than `create_all`.
+## Key Learning Outcomes
 
-## Demo walkthrough
-1. Open Dashboard and show the summary cards.
-2. Go to Employees → Add employee; create two employees in different departments.
-3. Go to Tasks → Create task; create tasks with different priorities and assign them to those employees.
-4. Show assigned employee names and due dates in the task table.
-5. Change a task from Pending → In Progress → Completed.
-6. Return to Dashboard and show that the totals and completed/pending counts update from PostgreSQL records.
-7. Open `/docs` and demonstrate the endpoints and request/response schemas.
+Through this project, I gained practical experience in:
 
-## Notes
-- This is a local practical-assignment implementation, not a production-hardened deployment. Add authentication/authorization, migrations, audit logging, pagination and stronger operational security before production use.
-- Employee deletion intentionally removes that employee's tasks to preserve referential integrity; the UI confirms this before deletion.
+- Building RESTful APIs using FastAPI.
+- Developing frontend interfaces using React.
+- Connecting a Python backend with a PostgreSQL database.
+- Performing CRUD operations.
+- Implementing employee and task management workflows.
+- Integrating frontend and backend using HTTP requests.
+- Testing API endpoints using Swagger UI.
+- Managing project dependencies and environment variables.
+- Using Docker for database setup.
+- Managing source code using Git and GitHub.
+
+## Future Enhancements
+
+- User authentication and role-based access control.
+- Employee-specific task dashboards.
+- Task deadline notifications.
+- Task priority-based filtering.
+- Improved dashboard analytics.
+- Cloud deployment.
+
+## Sai Grishma
+
+**Computer Science & Engineering Graduate**
+
+
+
+---
+
+If you find this project useful, feel free to ⭐ the repository.
